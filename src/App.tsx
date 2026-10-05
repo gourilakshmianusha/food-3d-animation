@@ -111,7 +111,7 @@ const AppContent: React.FC = () => {
         title={currentSEO.title}
         description={currentSEO.description}
         keywords={currentSEO.keywords}
-        ogImage="/og-feature-image.png"
+        ogImage={currentSEO.ogImage}
       />
 
       {/* Premium Initial Loading Experience */}

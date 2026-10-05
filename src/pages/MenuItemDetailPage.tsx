@@ -322,6 +322,8 @@ export const MenuItemDetailPage: React.FC<MenuItemDetailPageProps> = ({ slug }) 
         onClose={() => setShareModalOpen(false)}
         title={dish.name.toUpperCase()}
         subtitle={`${dish.category} · Crafted on Live White Oak Embers`}
+        badge="SIGNATURE WOODFIRE DISH"
+        ogImageUrl={dish.image}
       />
     </div>
   );

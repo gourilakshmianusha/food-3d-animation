@@ -181,6 +181,8 @@ export const BlogPostDetailPage: React.FC<BlogPostDetailPageProps> = ({ slug }) 
         onClose={() => setShareModalOpen(false)}
         title={post.title.toUpperCase()}
         subtitle={`The Hearth Chronicle · By ${post.author}`}
+        badge={post.category.toUpperCase()}
+        ogImageUrl={post.featuredImage}
       />
     </div>
   );

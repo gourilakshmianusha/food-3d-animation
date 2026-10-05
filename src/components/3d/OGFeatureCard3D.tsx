@@ -6,6 +6,9 @@ import { useApp } from '../../context/AppContext';
 interface OGFeatureCard3DProps {
   title?: string;
   subtitle?: string;
+  badge?: string;
+  detail?: string;
+  ogImageUrl?: string;
   pageUrl?: string;
   interactive?: boolean;
 }
@@ -13,6 +16,9 @@ interface OGFeatureCard3DProps {
 export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
   title = 'THE EMBER TABLE',
   subtitle = 'Crafted for the Senses · Live Woodfire Gastronomy',
+  badge = 'MICHELIN GUIDE 2026 · THREE KEYS',
+  detail = 'Coastal California White Oak Coals · 72h Wild Ferment · Rare Cellar Allocations',
+  ogImageUrl = '/og-home.png',
   pageUrl,
   interactive = true,
 }) => {
@@ -82,31 +88,17 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
     scene.add(rimLight);
 
     // 3. Create Canvas Textures for Front & Back
-    // Front Face Canvas (1200x630 ratio -> 2048x1080 for crisp texture)
     const frontCanvas = document.createElement('canvas');
     frontCanvas.width = 1200;
     frontCanvas.height = 630;
     const fctx = frontCanvas.getContext('2d')!;
 
-    // Draw Front Canvas OG Social Card
-    const drawFront = () => {
-      // Obsidian radial background
-      const bgGrad = fctx.createRadialGradient(240, 500, 50, 600, 315, 750);
-      bgGrad.addColorStop(0, '#592004');
-      bgGrad.addColorStop(0.35, '#1e140d');
-      bgGrad.addColorStop(0.8, '#0d0f14');
-      bgGrad.addColorStop(1, '#08090b');
-      fctx.fillStyle = bgGrad;
-      fctx.fillRect(0, 0, 1200, 630);
+    const frontTexture = new THREE.CanvasTexture(frontCanvas);
+    frontTexture.generateMipmaps = true;
+    frontTexture.minFilter = THREE.LinearMipmapLinearFilter;
 
-      // Gold Glow behind Cloche area
-      const clocheGlow = fctx.createRadialGradient(980, 300, 10, 980, 300, 260);
-      clocheGlow.addColorStop(0, 'rgba(212, 175, 55, 0.35)');
-      clocheGlow.addColorStop(0.5, 'rgba(212, 175, 55, 0.08)');
-      clocheGlow.addColorStop(1, 'rgba(0,0,0,0)');
-      fctx.fillStyle = clocheGlow;
-      fctx.fillRect(700, 50, 500, 500);
-
+    // Helper: Draw standard UI overlay on canvas
+    const drawOverlayText = () => {
       // Outer Gold Double Border with Corner Flourishes
       fctx.strokeStyle = '#d4af37';
       fctx.lineWidth = 3;
@@ -131,12 +123,13 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
       drawCorner(36, 594, 1, -1);
       drawCorner(1164, 594, -1, -1);
 
-      // Michelin Guide Badge
+      // Badge Pill
       fctx.fillStyle = '#171922';
       fctx.strokeStyle = 'rgba(212, 175, 55, 0.6)';
       fctx.lineWidth = 1.5;
       fctx.beginPath();
-      fctx.roundRect(84, 90, 380, 34, 17);
+      const badgeWidth = Math.min(420, badge.length * 10 + 44);
+      fctx.roundRect(84, 90, badgeWidth, 34, 17);
       fctx.fill();
       fctx.stroke();
 
@@ -145,9 +138,9 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
       fctx.fillStyle = '#f59e0b';
       fctx.fill();
 
-      fctx.font = 'bold 13px Cinzel, Georgia, serif';
+      fctx.font = 'bold 12px Cinzel, Georgia, serif';
       fctx.fillStyle = '#fef08a';
-      fctx.fillText('MICHELIN GUIDE 2026 · THREE KEYS', 120, 112);
+      fctx.fillText(badge, 120, 112);
 
       // Main Brand Title
       const titleGrad = fctx.createLinearGradient(84, 150, 700, 240);
@@ -156,17 +149,17 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
       titleGrad.addColorStop(0.7, '#d4af37');
       titleGrad.addColorStop(1, '#ca8a04');
       fctx.fillStyle = titleGrad;
-      fctx.font = 'bold 62px Cinzel, Georgia, serif';
-      fctx.fillText('THE EMBER TABLE', 84, 210);
+      fctx.font = 'bold 54px Cinzel, Georgia, serif';
+      fctx.fillText(title.length > 28 ? title.slice(0, 28) + '...' : title, 84, 210);
 
       // Subtitle
       fctx.fillStyle = '#e2e8f0';
-      fctx.font = '300 24px -apple-system, BlinkMacSystemFont, sans-serif';
-      fctx.fillText('Crafted for the Senses · Live Woodfire Gastronomy', 84, 260);
+      fctx.font = '300 23px -apple-system, BlinkMacSystemFont, sans-serif';
+      fctx.fillText(subtitle.length > 45 ? subtitle.slice(0, 45) + '...' : subtitle, 84, 260);
 
       fctx.fillStyle = '#94a3b8';
       fctx.font = '400 16px -apple-system, BlinkMacSystemFont, sans-serif';
-      fctx.fillText('Coastal White Oak Coals · 72h Wild Ferment · Rare Cellar Allocations', 84, 298);
+      fctx.fillText(detail.length > 60 ? detail.slice(0, 60) + '...' : detail, 84, 298);
 
       // Badges
       const drawBadge = (x: number, text: string, gold = false) => {
@@ -179,12 +172,12 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
         fctx.stroke();
 
         fctx.fillStyle = gold ? '#fef08a' : '#cbd5e1';
-        fctx.font = '500 14px -apple-system, sans-serif';
+        fctx.font = '500 13px -apple-system, sans-serif';
         fctx.fillText(text, x + 16, 366);
       };
-      drawBadge(84, '★ 4.9 (1,280+)', true);
-      drawBadge(256, 'A5 Wagyu Cut');
-      drawBadge(428, 'Reserve Cellar');
+      drawBadge(84, '★ 4.9 Rated', true);
+      drawBadge(256, 'Woodfire Line');
+      drawBadge(428, 'Pier 7 San Francisco');
 
       // Footer Location & Domain
       fctx.strokeStyle = 'rgba(255,255,255,0.12)';
@@ -200,28 +193,60 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
 
       fctx.fillStyle = '#64748b';
       fctx.font = '400 13px monospace';
-      fctx.fillText('og:image 1200x630 · Schema.org FoodEstablishment', 84, 510);
-
-      // Cloche Stylized Motif on Canvas Right
-      fctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
-      fctx.lineWidth = 1.5;
-      fctx.beginPath();
-      fctx.arc(970, 310, 140, 0, Math.PI * 2);
-      fctx.stroke();
-
-      fctx.beginPath();
-      fctx.arc(970, 310, 165, 0, Math.PI * 2);
-      fctx.setLineDash([6, 6]);
-      fctx.stroke();
-      fctx.setLineDash([]);
-
-      fctx.fillStyle = '#fef08a';
-      fctx.font = 'bold 12px Cinzel, serif';
-      fctx.textAlign = 'center';
-      fctx.fillText('EST. 2018 · SAN FRANCISCO', 970, 470);
-      fctx.textAlign = 'left';
+      fctx.fillText('1200x630 OpenGraph 2.0 · Three.js Animated Mesh', 84, 510);
     };
-    drawFront();
+
+    // Draw fallback canvas
+    const drawFallback = () => {
+      const bgGrad = fctx.createRadialGradient(240, 500, 50, 600, 315, 750);
+      bgGrad.addColorStop(0, '#592004');
+      bgGrad.addColorStop(0.35, '#1e140d');
+      bgGrad.addColorStop(0.8, '#0d0f14');
+      bgGrad.addColorStop(1, '#08090b');
+      fctx.fillStyle = bgGrad;
+      fctx.fillRect(0, 0, 1200, 630);
+
+      const clocheGlow = fctx.createRadialGradient(980, 300, 10, 980, 300, 260);
+      clocheGlow.addColorStop(0, 'rgba(212, 175, 55, 0.35)');
+      clocheGlow.addColorStop(0.5, 'rgba(212, 175, 55, 0.08)');
+      clocheGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      fctx.fillStyle = clocheGlow;
+      fctx.fillRect(700, 50, 500, 500);
+
+      drawOverlayText();
+    };
+
+    // Render Front: check if ogImageUrl is provided
+    drawFallback();
+
+    if (ogImageUrl) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = ogImageUrl;
+      img.onload = () => {
+        // If image is a pre-rendered OG card (contains /og-)
+        if (ogImageUrl.includes('/og-')) {
+          fctx.drawImage(img, 0, 0, 1200, 630);
+        } else {
+          // If it's a dish photo or external photo:
+          fctx.drawImage(img, 0, 0, 1200, 630);
+          // Dark Chiaroscuro overlay
+          const darkGrad = fctx.createLinearGradient(0, 0, 0, 630);
+          darkGrad.addColorStop(0, 'rgba(8, 9, 11, 0.4)');
+          darkGrad.addColorStop(0.5, 'rgba(8, 9, 11, 0.75)');
+          darkGrad.addColorStop(1, 'rgba(8, 9, 11, 0.95)');
+          fctx.fillStyle = darkGrad;
+          fctx.fillRect(0, 0, 1200, 630);
+
+          drawOverlayText();
+        }
+        frontTexture.needsUpdate = true;
+      };
+      img.onerror = () => {
+        drawFallback();
+        frontTexture.needsUpdate = true;
+      };
+    }
 
     // Back Face Canvas (Schema Verification & QR Code)
     const backCanvas = document.createElement('canvas');
@@ -329,10 +354,6 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
       bctx.textAlign = 'left';
     };
     drawBack();
-
-    const frontTexture = new THREE.CanvasTexture(frontCanvas);
-    frontTexture.generateMipmaps = true;
-    frontTexture.minFilter = THREE.LinearMipmapLinearFilter;
 
     const backTexture = new THREE.CanvasTexture(backCanvas);
     backTexture.generateMipmaps = true;
@@ -566,7 +587,7 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
       }
       renderer.dispose();
     };
-  }, []);
+  }, [title, subtitle, badge, detail, ogImageUrl, pageUrl]);
 
   const handleCopyLink = () => {
     const url = pageUrl || (typeof window !== 'undefined' ? window.location.href : 'https://theembertable.com');
@@ -577,13 +598,14 @@ export const OGFeatureCard3D: React.FC<OGFeatureCard3DProps> = ({
   };
 
   const handleDownloadOG = () => {
+    const targetSrc = ogImageUrl || '/og-home.png';
     const link = document.createElement('a');
-    link.href = '/og-feature-image.png';
-    link.download = 'the-ember-table-og-feature.png';
+    link.href = targetSrc;
+    link.download = targetSrc.split('/').pop() || 'the-ember-table-og.png';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('Downloading OG Image', '1200x630 social card PNG saved.', 'success');
+    showToast('Downloading OG Image', `Saved 1200x630 social card (${link.download}).`, 'success');
   };
 
   return (

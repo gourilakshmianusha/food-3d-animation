@@ -2,28 +2,41 @@ import React from 'react';
 import { X, Share2, Twitter, Facebook, MessageSquare, Linkedin, Link, Download } from 'lucide-react';
 import { OGFeatureCard3D } from '../3d/OGFeatureCard3D';
 import { useApp } from '../../context/AppContext';
+import { ROUTE_SEO } from './SEO';
 
 interface SocialShareModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   subtitle?: string;
+  badge?: string;
+  ogImageUrl?: string;
   url?: string;
 }
 
 export const SocialShareModal: React.FC<SocialShareModalProps> = ({
   isOpen,
   onClose,
-  title = 'THE EMBER TABLE',
-  subtitle = 'Crafted for the Senses · Live Woodfire Gastronomy',
+  title,
+  subtitle,
+  badge,
+  ogImageUrl,
   url,
 }) => {
-  const { showToast } = useApp();
+  const { currentRoute, showToast } = useApp();
   if (!isOpen) return null;
+
+  const currentPath = currentRoute ? currentRoute.split('?')[0] : '/';
+  const routeSEO = ROUTE_SEO[currentPath] || ROUTE_SEO['/'];
+
+  const resolvedTitle = title || routeSEO.title;
+  const resolvedSubtitle = subtitle || routeSEO.subtitle || routeSEO.description;
+  const resolvedBadge = badge || routeSEO.badge || 'MICHELIN GUIDE 2026 · THREE KEYS';
+  const resolvedOgImage = ogImageUrl || routeSEO.ogImage;
 
   const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://theembertable.com');
   const encodedUrl = encodeURIComponent(currentUrl);
-  const shareText = encodeURIComponent('Experience Michelin-caliber woodfire gastronomy at The Ember Table on the San Francisco Embarcadero.');
+  const shareText = encodeURIComponent(`${resolvedTitle} — Experience Michelin-caliber woodfire gastronomy at The Ember Table.`);
 
   const socialLinks = [
     {
@@ -76,14 +89,16 @@ export const SocialShareModal: React.FC<SocialShareModalProps> = ({
             3D Animated Social Feature Card
           </h2>
           <p className="text-xs text-slate-400">
-            Preview how The Ember Table appears when shared on iMessage, Slack, Twitter/X, Discord, and Facebook.
+            Preview how this page appears with its unique card ({resolvedOgImage.split('/').pop()}) when shared on iMessage, Slack, Twitter/X, Discord, and Facebook.
           </p>
         </div>
 
         {/* 3D Animated Card Component */}
         <OGFeatureCard3D
-          title={title}
-          subtitle={subtitle}
+          title={resolvedTitle}
+          subtitle={resolvedSubtitle}
+          badge={resolvedBadge}
+          ogImageUrl={resolvedOgImage}
           pageUrl={currentUrl}
         />
 
