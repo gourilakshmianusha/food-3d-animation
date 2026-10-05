@@ -12,6 +12,7 @@ import {
   ContactMessage,
   SiteSettings,
   UserProfile,
+  Food3DAsset,
 } from '../types';
 import {
   INITIAL_MENU_ITEMS,
@@ -340,5 +341,99 @@ export const api = {
     };
     setStored('contact_messages', [newMsg, ...current]);
     return newMsg;
+  },
+
+  // 3D Image Library CRUD (Section 31)
+  get3DAssets: (): Food3DAsset[] => getStored('food_3d_assets', [
+    {
+      id: 'asset-1',
+      title: 'A5 Miyazaki Wagyu Plated Cut',
+      category: 'Steak & Meats',
+      imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+      type: 'dish',
+      shadowType: 'dramatic',
+      scale: 1,
+      rotation: 0,
+      isTransparent: true,
+    },
+    {
+      id: 'asset-2',
+      title: 'Perigord Black Truffle Tagliolini',
+      category: 'Pasta',
+      imageUrl: 'https://images.unsplash.com/photo-1621996346565-e3d5d6281724?auto=format&fit=crop&w=800&q=80',
+      type: 'dish',
+      shadowType: 'soft',
+      scale: 1,
+      rotation: 0,
+      isTransparent: true,
+    },
+    {
+      id: 'asset-3',
+      title: 'Oak-Charred Neapolitan Pizza',
+      category: 'Pizza',
+      imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80',
+      type: 'dish',
+      shadowType: 'contact',
+      scale: 1,
+      rotation: 0,
+      isTransparent: true,
+    },
+    {
+      id: 'asset-4',
+      title: 'The Ember Smoked Gold Burger',
+      category: 'Burgers',
+      imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80',
+      type: 'dish',
+      shadowType: 'soft',
+      scale: 1,
+      rotation: 0,
+      isTransparent: true,
+    },
+    {
+      id: 'asset-5',
+      title: 'Smoked Valrhona Chocolate Sphere',
+      category: 'Desserts',
+      imageUrl: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80',
+      type: 'dish',
+      shadowType: 'dramatic',
+      scale: 1,
+      rotation: 0,
+      isTransparent: true,
+    },
+    {
+      id: 'asset-6',
+      title: 'Wood-Grilled Chilean Sea Bass',
+      category: 'Continental',
+      imageUrl: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80',
+      type: 'dish',
+      shadowType: 'soft',
+      scale: 1,
+      rotation: 0,
+      isTransparent: true,
+    },
+  ]),
+  save3DAsset: (asset: Food3DAsset): Food3DAsset => {
+    const list = api.get3DAssets();
+    const idx = list.findIndex((a) => a.id === asset.id);
+    let updated: Food3DAsset[];
+    if (idx >= 0) {
+      updated = [...list];
+      updated[idx] = asset;
+    } else {
+      updated = [asset, ...list];
+    }
+    setStored('food_3d_assets', updated);
+    return asset;
+  },
+  delete3DAsset: (id: string): void => {
+    setStored('food_3d_assets', api.get3DAssets().filter((a) => a.id !== id));
+  },
+  assign3DImageToMenuItem: (menuItemId: string, threeDImageUrl: string): void => {
+    const items = api.getMenuItems();
+    const item = items.find((i) => i.id === menuItemId);
+    if (item) {
+      item.threeDImage = threeDImageUrl;
+      api.saveMenuItem(item);
+    }
   },
 };

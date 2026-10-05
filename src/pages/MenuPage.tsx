@@ -3,24 +3,17 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { MenuItem, FoodCategory } from '../types';
 import { INITIAL_CATEGORIES } from '../data/seedData';
-import { DishModelViewer } from '../components/canvas/DishModelViewer';
-import { MenuHero3D } from '../components/3d/MenuHero3D';
+import { FoodCard3D, PlateComposition } from '../components/food3d';
 import {
   Search,
-  SlidersHorizontal,
   Flame,
   Star,
   ShoppingBag,
-  Eye,
-  Heart,
-  Clock,
   Sparkles,
-  Info,
-  Check,
 } from 'lucide-react';
 
 export const MenuPage: React.FC = () => {
-  const { navigate, addToCart, favorites, toggleFavorite } = useApp();
+  const { navigate, addToCart } = useApp();
   const [items, setItems] = useState<MenuItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -61,32 +54,49 @@ export const MenuPage: React.FC = () => {
       });
   }, [items, selectedCategory, searchQuery, vegetarianOnly, chefSpecialOnly, sortBy]);
 
+  // Featured dish for the active category in the 3D Plate Showcase
+  const categorySpotlightDish = useMemo(() => {
+    if (filteredItems.length > 0) return filteredItems[0];
+    return items[0] || null;
+  }, [filteredItems, items]);
+
   return (
     <div className="min-h-screen bg-[#08090b] text-[#e2e8f0] pt-28 pb-24 px-6">
       <div className="max-w-7xl mx-auto">
         {/* 3D Menu Hero Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-12 glass-card p-6 sm:p-10 rounded-3xl border border-gold-subtle">
           <div className="lg:col-span-6 space-y-4">
-            <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold">
+            <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold flex items-center gap-1.5 font-mono">
+              <Sparkles className="w-3.5 h-3.5" />
               Interactive 3D Menu Explorer
             </span>
             <h1 className="font-serif text-3xl sm:text-5xl text-white font-light leading-tight">
               The Culinary Compendium
             </h1>
             <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
-              Every dish is cooked fresh over seasoned hardwood embers. Change categories below to morph
-              the 3D culinary centerpiece and explore custom woodfire finishes.
+              Every dish is cooked fresh over seasoned hardwood embers. Browse our disciplines below to
+              view realistic 3D plate compositions and explore artisanal woodfire preparations.
             </p>
             <div className="pt-2 flex items-center gap-2">
               <span className="text-xs text-slate-400">Viewing Active Discipline:</span>
-              <span className="text-xs font-bold text-gold-gradient uppercase font-mono px-2.5 py-1 rounded bg-white/5 border border-white/10">
+              <span className="text-xs font-bold text-gold-gradient uppercase font-mono px-3 py-1 rounded bg-white/5 border border-white/10">
                 {selectedCategory}
               </span>
             </div>
           </div>
 
-          <div className="lg:col-span-6 h-64 sm:h-80 relative rounded-2xl overflow-hidden glass-dark border border-white/5">
-            <MenuHero3D category={selectedCategory} />
+          <div className="lg:col-span-6 flex items-center justify-center">
+            {categorySpotlightDish && (
+              <PlateComposition
+                foodImage={categorySpotlightDish.image}
+                threeDFoodImage={categorySpotlightDish.threeDImage}
+                alt={categorySpotlightDish.name}
+                preset="truffle-pasta"
+                plateType="slate"
+                size="md"
+                caption={categorySpotlightDish.name}
+              />
+            )}
           </div>
         </div>
 
@@ -145,56 +155,43 @@ export const MenuPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Category Tabs (Segmented Controls) */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-2 scrollbar-thin">
+          {/* Category Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none pt-2 border-t border-white/5">
             <button
               onClick={() => setSelectedCategory('All')}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 selectedCategory === 'All'
                   ? 'bg-[#d4af37] text-[#0b0c10] shadow'
-                  : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
+                  : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
               }`}
             >
-              All Categories
+              All Offerings ({items.length})
             </button>
             {INITIAL_CATEGORIES.map((cat) => {
-              const active = selectedCategory.toLowerCase() === cat.name.toLowerCase();
+              const count = items.filter(
+                (i) => i.category.toLowerCase() === cat.name.toLowerCase()
+              ).length;
               return (
                 <button
-                  key={cat.slug}
+                  key={cat.name}
                   onClick={() => setSelectedCategory(cat.name)}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                    active
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                    selectedCategory === cat.name
                       ? 'bg-[#d4af37] text-[#0b0c10] shadow'
-                      : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
+                      : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  {cat.name}
+                  {cat.name} ({count})
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Results Counter */}
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-6 px-1">
-          <span>
-            Showing <strong className="text-white font-mono">{filteredItems.length}</strong> master dishes
-          </span>
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="text-[#d4af37] hover:underline"
-            >
-              Clear Search
-            </button>
-          )}
-        </div>
-
-        {/* Menu Cards Grid */}
+        {/* 3D Menu Cards Grid */}
         {filteredItems.length === 0 ? (
           <div className="text-center py-24 glass-card rounded-2xl border border-white/10">
-            <p className="text-lg font-serif text-slate-300">No dishes match your active filter.</p>
+            <p className="font-serif text-xl text-slate-300">No culinary offerings match your filter.</p>
             <button
               onClick={() => {
                 setSelectedCategory('All');
@@ -209,134 +206,25 @@ export const MenuPage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredItems.map((dish) => {
-              const isFav = favorites.includes(dish.id);
-              return (
-                <div
-                  key={dish.id}
-                  className="glass-card rounded-2xl overflow-hidden border border-gold-subtle flex flex-col group hover:-translate-y-1.5 transition-all duration-300 hover:shadow-2xl"
-                >
-                  {/* Image slot */}
-                  <div className="relative h-60 bg-black/40 overflow-hidden">
-                    <img
-                      src={dish.image}
-                      alt={dish.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0e1016] via-transparent to-black/30" />
-
-                    {/* Top status & actions */}
-                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-[#0b0c10]/80 text-[#d4af37] font-medium backdrop-blur">
-                          {dish.category}
-                        </span>
-                        {dish.isChefSpecial && (
-                          <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-[#e65100]/80 text-white font-medium backdrop-blur">
-                            Chef Special
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => setInspectedDish(dish)}
-                          className="p-1.5 rounded-full bg-black/60 text-slate-300 hover:text-white backdrop-blur transition-all"
-                          title="View in 3D"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => toggleFavorite(dish.id)}
-                          className={`p-1.5 rounded-full backdrop-blur transition-all ${
-                            isFav ? 'bg-rose-500 text-white' : 'bg-black/60 text-slate-300 hover:text-white'
-                          }`}
-                        >
-                          <Heart className="w-4 h-4 fill-current" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Bottom overlay metadata */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-slate-300">
-                      <div className="flex items-center gap-1.5">
-                        <Star className="w-3.5 h-3.5 text-[#d4af37] fill-current" />
-                        <span className="font-semibold text-white">{dish.rating}</span>
-                        <span className="text-slate-400">({dish.reviewCount})</span>
-                      </div>
-                      <span className="text-[11px] text-slate-400">{dish.prepTime}</span>
-                    </div>
-                  </div>
-
-                  {/* Body Content */}
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3
-                        onClick={() => navigate(`/menu/${dish.slug}`)}
-                        className="font-serif text-xl text-white font-medium hover:text-[#d4af37] cursor-pointer transition-colors"
-                      >
-                        {dish.name}
-                      </h3>
-                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mt-1 mb-4">
-                        {dish.description}
-                      </p>
-
-                      {/* Ingredients metadata with typographic separators */}
-                      <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5 mb-5">
-                        {dish.ingredients.slice(0, 3).map((ing, idx) => (
-                          <React.Fragment key={idx}>
-                            <span>{ing}</span>
-                            {idx < 2 && <span aria-hidden="true">·</span>}
-                          </React.Fragment>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xl font-bold font-serif text-gold-gradient tabular-nums">
-                          ${dish.discountPrice ?? dish.price}
-                        </span>
-                        {dish.discountPrice && (
-                          <span className="text-xs line-through text-slate-500 tabular-nums">
-                            ${dish.price}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setInspectedDish(dish)}
-                          className="px-3 py-1.5 text-xs rounded glass-dark text-slate-300 hover:text-white border border-white/10"
-                        >
-                          3D Model
-                        </button>
-                        <button
-                          onClick={() => addToCart(dish, 1)}
-                          className="p-2 bg-[#d4af37] hover:bg-[#e5be49] text-[#0b0c10] rounded transition-all shadow hover:scale-105"
-                          title="Add to Dining Bag"
-                        >
-                          <ShoppingBag className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {filteredItems.map((dish) => (
+              <FoodCard3D
+                key={dish.id}
+                item={dish}
+                onInspect={(d) => setInspectedDish(d)}
+              />
+            ))}
           </div>
         )}
       </div>
 
-      {/* 3D Inspection Modal */}
+      {/* 3D Food Card Quick Modal Inspection */}
       {inspectedDish && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in">
-          <div className="max-w-2xl w-full glass-card p-6 rounded-2xl border border-gold-subtle shadow-2xl relative">
+          <div className="max-w-2xl w-full glass-card p-6 sm:p-8 rounded-2xl border border-gold-subtle shadow-2xl relative">
             <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
               <div>
-                <span className="text-[11px] uppercase tracking-wider text-[#d4af37] font-semibold block">
-                  3D Interactive Inspection
+                <span className="text-[11px] uppercase tracking-wider text-[#d4af37] font-semibold block font-mono">
+                  3D Food Presentation
                 </span>
                 <h3 className="font-serif text-2xl text-white">{inspectedDish.name}</h3>
               </div>
@@ -348,13 +236,24 @@ export const MenuPage: React.FC = () => {
               </button>
             </div>
 
-            <DishModelViewer modelType={inspectedDish.model3d || 'cloche'} />
+            <div className="flex justify-center py-4">
+              <PlateComposition
+                foodImage={inspectedDish.image}
+                threeDFoodImage={inspectedDish.threeDImage}
+                alt={inspectedDish.name}
+                size="md"
+              />
+            </div>
 
-            <div className="pt-5 flex items-center justify-between">
+            <p className="text-xs text-slate-300 leading-relaxed mt-2">
+              {inspectedDish.description}
+            </p>
+
+            <div className="pt-5 flex items-center justify-between border-t border-white/10 mt-4">
               <div>
-                <span className="text-xs text-slate-400 block">Chef's Price</span>
+                <span className="text-xs text-slate-400 block font-mono">Price</span>
                 <span className="text-2xl font-serif font-bold text-gold-gradient tabular-nums">
-                  ${inspectedDish.discountPrice ?? inspectedDish.price}
+                  ${(inspectedDish.discountPrice ?? inspectedDish.price).toFixed(2)}
                 </span>
               </div>
 
@@ -366,7 +265,7 @@ export const MenuPage: React.FC = () => {
                   }}
                   className="px-4 py-2 glass-dark text-slate-300 hover:text-white text-xs font-semibold rounded border border-white/10"
                 >
-                  Tasting Notes & Ingredients
+                  Full Details & Notes
                 </button>
                 <button
                   onClick={() => {

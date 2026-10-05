@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../brand/Logo';
-import { ShoppingBag, Calendar, User, Menu as MenuIcon, X, Shield } from 'lucide-react';
+import { ShoppingBag, Calendar, User, Menu as MenuIcon, X, Shield, Share2 } from 'lucide-react';
+import { SocialShareModal } from '../common/SocialShareModal';
 
 export const Navbar: React.FC = () => {
   const { currentRoute, navigate, cart, user, isAdmin } = useApp();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,6 +69,17 @@ export const Navbar: React.FC = () => {
 
         {/* Zone 3: 1-2 Primary Actions & Controls */}
         <div className="flex items-center gap-3">
+          {/* 3D Social Card & Share Button */}
+          <button
+            onClick={() => setShareModalOpen(true)}
+            className="p-2 text-slate-300 hover:text-[#d4af37] transition-colors rounded-lg hover:bg-white/5 flex items-center gap-1.5"
+            title="3D Social Card & Share"
+            aria-label="3D Social Card & Share"
+          >
+            <Share2 className="w-4 h-4 text-[#d4af37]" />
+            <span className="hidden xl:inline text-xs font-semibold text-slate-300">Share</span>
+          </button>
+
           {/* Cart Affordance */}
           <button
             onClick={() => navigate('/cart')}
@@ -203,6 +216,12 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* 3D Animated Social Card Modal */}
+      <SocialShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+      />
     </header>
   );
 };

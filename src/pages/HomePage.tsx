@@ -8,6 +8,8 @@ import { DishModelViewer } from '../components/canvas/DishModelViewer';
 import { SignatureDishScroll3D } from '../components/3d/SignatureDishScroll3D';
 import { ChefSection3D } from '../components/3d/ChefSection3D';
 import { TableScene } from '../components/3d/TableScene';
+import { OGFeatureCard3D } from '../components/3d/OGFeatureCard3D';
+import { SEO } from '../components/common/SEO';
 import {
   Calendar,
   ArrowRight,
@@ -78,6 +80,13 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-[#08090b] text-[#e2e8f0] overflow-hidden">
+      <SEO
+        title="Live Woodfire Fine Dining & Reserve Cellar"
+        description="Experience Michelin-caliber woodfire gastronomy, tableside cloche reveals, and artisanal wine pairings on the San Francisco Embarcadero."
+        keywords="The Ember Table, fine dining San Francisco, woodfire restaurant, Michelin dining, A5 Wagyu, Embarcadero waterfront"
+        ogImage="/og-feature-image.png"
+      />
+
       {/* ========================================================
           1. 3D HERO SECTION: "CRAFTED FOR THE SENSES"
       ======================================================== */}
@@ -473,7 +482,31 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* ========================================================
-          9. RESERVATION CALL TO ACTION — 3D TABLE SCENE
+          9. 3D OPENGRAPH FEATURE IMAGE & SOCIAL SANCTUARY
+      ======================================================== */}
+      <section className="py-24 px-6 bg-[#060709] border-t border-white/5 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold flex items-center justify-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              Social Presence &amp; Rich Cards
+            </span>
+            <h2 className="font-brand text-3xl sm:text-4xl lg:text-5xl font-bold text-white uppercase tracking-tight">
+              3D Social Feature Card
+            </h2>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Every link shared across Twitter, WhatsApp, iMessage, and Slack dynamically renders our
+              fine-dining OpenGraph card with metallic foil, embers, and Schema.org metadata.
+            </p>
+          </div>
+
+          {/* Interactive 3D Card Viewer Component */}
+          <OGFeatureCard3D />
+        </div>
+      </section>
+
+      {/* ========================================================
+          10. RESERVATION CALL TO ACTION — 3D TABLE SCENE
       ======================================================== */}
       <section className="py-24 px-6 bg-gradient-to-b from-[#08090b] via-[#120f0c] to-[#08090b] border-t border-white/5 relative overflow-hidden">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">

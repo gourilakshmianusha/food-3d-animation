@@ -23,6 +23,7 @@ export interface MenuItem {
   price: number;
   discountPrice?: number;
   image: string;
+  threeDImage?: string; // High-resolution transparent 3D-rendered food asset
   model3d?: 'cloche' | 'steak' | 'burger' | 'pizza' | 'pasta' | 'dessert' | 'beverage' | 'coffee';
   isVeg: boolean;
   spicyLevel: 0 | 1 | 2 | 3;
@@ -36,6 +37,18 @@ export interface MenuItem {
   tags: string[];
   rating: number;
   reviewCount: number;
+}
+
+export interface Food3DAsset {
+  id: string;
+  title: string;
+  category: string;
+  imageUrl: string;
+  type: 'dish' | 'ingredient' | 'plate' | 'beverage';
+  shadowType?: 'soft' | 'contact' | 'ambient' | 'dramatic';
+  scale?: number;
+  rotation?: number;
+  isTransparent?: boolean;
 }
 
 export interface CartItem {

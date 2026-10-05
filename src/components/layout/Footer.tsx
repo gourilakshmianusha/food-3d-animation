@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Logo } from '../brand/Logo';
-import { MapPin, Phone, Mail, Clock, ArrowRight, Instagram, Facebook, Twitter, Check } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, ArrowRight, Instagram, Facebook, Twitter, Check, Share2, Sparkles } from 'lucide-react';
+import { SocialShareModal } from '../common/SocialShareModal';
 
 export const Footer: React.FC = () => {
   const { navigate, siteSettings, showToast } = useApp();
   const [emailInput, setEmailInput] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,8 +172,8 @@ export const Footer: React.FC = () => {
               </div>
             </div>
 
-            {/* Social Links */}
-            <div className="flex items-center gap-3 pt-2">
+            {/* Social Links & 3D OG Preview Button */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <a
                 href={siteSettings.socialLinks.instagram}
                 target="_blank"
@@ -199,6 +201,15 @@ export const Footer: React.FC = () => {
               >
                 <Twitter className="w-4 h-4" />
               </a>
+
+              <button
+                onClick={() => setShareModalOpen(true)}
+                className="h-8 px-2.5 rounded bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center gap-1.5 text-xs text-[#d4af37] font-semibold transition-all"
+                title="Launch 3D Social Feature Card"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>3D Social Card</span>
+              </button>
             </div>
           </div>
         </div>
@@ -223,6 +234,12 @@ export const Footer: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 3D Animated Social Feature Card Modal */}
+      <SocialShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+      />
     </footer>
   );
 };

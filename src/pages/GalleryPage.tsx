@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { GalleryItem, GalleryCategory } from '../types';
 import { Maximize2, X, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
-import { Gallery3DScene } from '../components/3d/Gallery3DScene';
+import { FoodGallery3D } from '../components/food3d';
 
 export const GalleryPage: React.FC = () => {
   const [items, setItems] = useState<GalleryItem[]>([]);
@@ -50,7 +50,7 @@ export const GalleryPage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold">
+          <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold font-mono">
             Visual Storytelling
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-white font-light">
@@ -61,9 +61,9 @@ export const GalleryPage: React.FC = () => {
           </p>
         </div>
 
-        {/* 3D Spatial Gallery Carousel */}
+        {/* 3D Physical Photo Gallery Spotlight */}
         {items.length > 0 && (
-          <Gallery3DScene
+          <FoodGallery3D
             items={items}
             onSelectImage={(idx) => openLightbox(idx)}
             className="mb-8"
@@ -78,7 +78,7 @@ export const GalleryPage: React.FC = () => {
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 activeCategory === cat
-                  ? 'bg-[#d4af37] text-[#0b0c10] shadow'
+                  ? 'bg-[#d4af37] text-[#0b0c10] shadow font-bold'
                   : 'glass-dark text-slate-400 hover:text-white border border-white/5'
               }`}
             >
@@ -93,33 +93,31 @@ export const GalleryPage: React.FC = () => {
             <div
               key={item.id}
               onClick={() => openLightbox(index)}
-              className="glass-card rounded-2xl overflow-hidden border border-white/10 group cursor-pointer relative transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              className="glass-card rounded-2xl overflow-hidden border border-white/10 group cursor-pointer relative transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-[#d4af37]/40"
             >
               <div className="h-64 sm:h-72 overflow-hidden relative">
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
 
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="p-1.5 rounded-full bg-black/60 text-white backdrop-blur flex items-center justify-center">
-                    <Maximize2 className="w-3.5 h-3.5" />
-                  </span>
-                </div>
+                <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+                  <div>
+                    <span className="text-[10px] uppercase font-mono tracking-widest text-[#d4af37] font-semibold block">
+                      {item.category}
+                    </span>
+                    <h3 className="font-serif text-base text-white font-medium line-clamp-1">
+                      {item.title}
+                    </h3>
+                  </div>
 
-                <div className="absolute bottom-4 left-4 right-4">
-                  <span className="text-[10px] uppercase tracking-wider text-[#d4af37] font-semibold block mb-0.5">
-                    {item.category}
-                  </span>
-                  <h3 className="font-serif text-lg text-white font-medium drop-shadow leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="text-[11px] text-slate-300 mt-1 line-clamp-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {item.description}
-                  </p>
+                  <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Maximize2 className="w-4 h-4" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -128,50 +126,49 @@ export const GalleryPage: React.FC = () => {
 
         {/* Lightbox Modal */}
         {lightboxIndex !== null && filteredItems[lightboxIndex] && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 animate-in fade-in">
+          <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
             <button
               onClick={closeLightbox}
               className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label="Close"
             >
               <X className="w-6 h-6" />
             </button>
 
             <button
               onClick={prevImage}
-              className="absolute left-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label="Previous image"
+              className="absolute left-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
 
-            <button
-              onClick={nextImage}
-              className="absolute right-6 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label="Next image"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            <div className="max-w-4xl max-h-[85vh] flex flex-col items-center">
+            <div className="max-w-4xl max-h-[80vh] flex flex-col items-center">
               <img
                 src={filteredItems[lightboxIndex].image}
                 alt={filteredItems[lightboxIndex].title}
-                className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl shadow-2xl border border-white/10"
+                className="max-h-[70vh] max-w-full object-contain rounded-xl shadow-2xl border border-white/10"
                 referrerPolicy="no-referrer"
               />
-              <div className="text-center mt-4 space-y-1">
-                <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold">
+              <div className="mt-4 text-center">
+                <span className="text-xs uppercase tracking-widest text-[#d4af37] font-mono">
                   {filteredItems[lightboxIndex].category}
                 </span>
-                <h3 className="font-serif text-2xl text-white">
+                <h4 className="font-serif text-xl text-white font-medium mt-1">
                   {filteredItems[lightboxIndex].title}
-                </h3>
-                <p className="text-xs text-slate-400 max-w-md mx-auto">
-                  {filteredItems[lightboxIndex].description}
-                </p>
+                </h4>
+                {filteredItems[lightboxIndex].description && (
+                  <p className="text-xs text-slate-300 mt-1 max-w-lg">
+                    {filteredItems[lightboxIndex].description}
+                  </p>
+                )}
               </div>
             </div>
+
+            <button
+              onClick={nextImage}
+              className="absolute right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
           </div>
         )}
       </div>

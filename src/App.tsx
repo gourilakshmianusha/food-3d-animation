@@ -10,6 +10,7 @@ import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ToastContainer } from './components/common/ToastContainer';
 import { LoadingScreen } from './components/common/LoadingScreen';
+import { SEO, ROUTE_SEO } from './components/common/SEO';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -45,6 +46,8 @@ const AppContent: React.FC = () => {
 
   // Enable Lenis Smooth Scroll with GSAP ScrollTrigger for customer routes
   useSmoothScroll(!isAdminRoute);
+
+  const currentSEO = ROUTE_SEO[path] || ROUTE_SEO['/'];
 
   // Match routes
   const renderRoute = () => {
@@ -103,6 +106,14 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#08090b] text-[#e2e8f0] selection:bg-[#d4af37]/30 selection:text-white">
+      {/* Dynamic SEO Meta Tags & OpenGraph Synchronizer */}
+      <SEO
+        title={currentSEO.title}
+        description={currentSEO.description}
+        keywords={currentSEO.keywords}
+        ogImage="/og-feature-image.png"
+      />
+
       {/* Premium Initial Loading Experience */}
       {initialLoading && <LoadingScreen onComplete={() => setInitialLoading(false)} />}
 

@@ -3,6 +3,8 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { MenuItem } from '../types';
 import { DishModelViewer } from '../components/canvas/DishModelViewer';
+import { SEO } from '../components/common/SEO';
+import { SocialShareModal } from '../components/common/SocialShareModal';
 import {
   ArrowLeft,
   Star,
@@ -14,6 +16,7 @@ import {
   Plus,
   Minus,
   Sparkles,
+  Share2,
 } from 'lucide-react';
 
 interface MenuItemDetailPageProps {
@@ -26,6 +29,7 @@ export const MenuItemDetailPage: React.FC<MenuItemDetailPageProps> = ({ slug }) 
   const [activeMedia, setActiveMedia] = useState<'photo' | '3d'>('3d');
   const [quantity, setQuantity] = useState(1);
   const [instructions, setInstructions] = useState('');
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   useEffect(() => {
     const items = api.getMenuItems();
@@ -50,6 +54,27 @@ export const MenuItemDetailPage: React.FC<MenuItemDetailPageProps> = ({ slug }) 
 
   return (
     <div className="min-h-screen bg-[#08090b] text-[#e2e8f0] pt-28 pb-24 px-6">
+      <SEO
+        title={`${dish.name} — ${dish.category}`}
+        description={`${dish.description} Crafted on live California white oak coals. Order online or reserve tableside.`}
+        keywords={`${dish.name}, ${dish.category}, woodfire dining, fine dining dish, San Francisco`}
+        ogImage={dish.image}
+        ogType="food"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'MenuItem',
+          name: dish.name,
+          description: dish.description,
+          image: dish.image,
+          offers: {
+            '@type': 'Offer',
+            price: (dish.discountPrice ?? dish.price).toString(),
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+          },
+        }}
+      />
+
       <div className="max-w-6xl mx-auto">
         {/* Back breadcrumb */}
         <button
@@ -141,17 +166,26 @@ export const MenuItemDetailPage: React.FC<MenuItemDetailPageProps> = ({ slug }) 
                 <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold">
                   {dish.category}
                 </span>
-                <button
-                  onClick={() => toggleFavorite(dish.id)}
-                  className={`p-2 rounded-full border transition-all ${
-                    isFav
-                      ? 'bg-rose-500/20 text-rose-400 border-rose-500/50'
-                      : 'border-white/10 text-slate-400 hover:text-white'
-                  }`}
-                  title="Favorite Dish"
-                >
-                  <Heart className="w-4 h-4 fill-current" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShareModalOpen(true)}
+                    className="p-2 rounded-full border border-white/10 text-slate-400 hover:text-[#d4af37] hover:border-[#d4af37]/40 transition-all"
+                    title="Share Dish with 3D Card"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => toggleFavorite(dish.id)}
+                    className={`p-2 rounded-full border transition-all ${
+                      isFav
+                        ? 'bg-rose-500/20 text-rose-400 border-rose-500/50'
+                        : 'border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                    title="Favorite Dish"
+                  >
+                    <Heart className="w-4 h-4 fill-current" />
+                  </button>
+                </div>
               </div>
 
               <h1 className="font-serif text-3xl sm:text-4xl text-white font-medium">
@@ -281,6 +315,14 @@ export const MenuItemDetailPage: React.FC<MenuItemDetailPageProps> = ({ slug }) 
           </div>
         </div>
       </div>
+
+      {/* 3D Animated Social Card Modal for Dish */}
+      <SocialShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        title={dish.name.toUpperCase()}
+        subtitle={`${dish.category} · Crafted on Live White Oak Embers`}
+      />
     </div>
   );
 };

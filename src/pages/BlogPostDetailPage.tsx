@@ -3,6 +3,8 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { BlogPost } from '../types';
 import { ArrowLeft, Clock, Calendar, User, Share2, Tag, ArrowRight } from 'lucide-react';
+import { SEO } from '../components/common/SEO';
+import { SocialShareModal } from '../components/common/SocialShareModal';
 
 interface BlogPostDetailPageProps {
   slug: string;
@@ -12,6 +14,7 @@ export const BlogPostDetailPage: React.FC<BlogPostDetailPageProps> = ({ slug }) 
   const { navigate, showToast } = useApp();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [related, setRelated] = useState<BlogPost[]>([]);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   useEffect(() => {
     const all = api.getBlogs();
@@ -34,12 +37,39 @@ export const BlogPostDetailPage: React.FC<BlogPostDetailPageProps> = ({ slug }) 
   }
 
   const handleShare = () => {
-    navigator.clipboard?.writeText(window.location.href);
-    showToast('Link Copied', 'Article URL copied to your clipboard.', 'success');
+    setShareModalOpen(true);
   };
 
   return (
     <div className="min-h-screen bg-[#08090b] text-[#e2e8f0] pt-28 pb-24 px-6">
+      <SEO
+        title={post.title}
+        description={post.excerpt}
+        keywords={`${post.tags.join(', ')}, ${post.category}, culinary essay, The Ember Table`}
+        ogImage={post.featuredImage}
+        ogType="article"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: post.title,
+          description: post.excerpt,
+          image: post.featuredImage,
+          datePublished: post.publishDate,
+          author: {
+            '@type': 'Person',
+            name: post.author,
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'The Ember Table',
+            logo: {
+              '@type': 'ImageObject',
+              url: 'https://theembertable.com/favicon.svg',
+            },
+          },
+        }}
+      />
+
       <article className="max-w-4xl mx-auto space-y-10">
         <button
           onClick={() => navigate('/blog')}
@@ -144,6 +174,14 @@ export const BlogPostDetailPage: React.FC<BlogPostDetailPageProps> = ({ slug }) 
           </div>
         </div>
       </article>
+
+      {/* 3D Animated Social Card Modal for Blog Article */}
+      <SocialShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        title={post.title.toUpperCase()}
+        subtitle={`The Hearth Chronicle · By ${post.author}`}
+      />
     </div>
   );
 };

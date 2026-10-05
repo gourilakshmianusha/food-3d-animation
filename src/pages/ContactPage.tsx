@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare, CheckCircle2 } from 'lucide-react';
-import { Location3DScene } from '../components/3d/Location3DScene';
+import { FoodTilt } from '../components/food3d';
 
 export const ContactPage: React.FC = () => {
   const { siteSettings, showToast } = useApp();
@@ -41,7 +41,7 @@ export const ContactPage: React.FC = () => {
       <div className="max-w-6xl mx-auto space-y-16">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold">
+          <span className="text-xs uppercase tracking-widest text-[#d4af37] font-semibold font-mono">
             At Your Service
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-white font-light">
@@ -59,22 +59,19 @@ export const ContactPage: React.FC = () => {
 
             {isSubmitted ? (
               <div className="text-center py-12 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center mx-auto text-[#d4af37]">
-                  <CheckCircle2 className="w-7 h-7" />
+                <div className="w-16 h-16 rounded-full bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center mx-auto text-[#d4af37]">
+                  <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h3 className="font-serif text-2xl text-white">Message Transmitted</h3>
-                <p className="text-xs text-slate-300 max-w-md mx-auto">
-                  Thank you, <strong className="text-white">{formData.name}</strong>. Your message has been logged
-                  in our executive dispatch system.
+                <h3 className="font-serif text-2xl text-white">Inquiry Received</h3>
+                <p className="text-xs text-slate-300 max-w-sm mx-auto">
+                  Thank you, <strong className="text-white">{formData.name}</strong>. Our lead concierge will
+                  review your dispatch and respond within one solar cycle.
                 </p>
                 <button
-                  onClick={() => {
-                    setIsSubmitted(false);
-                    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-                  }}
-                  className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded uppercase tracking-wider"
+                  onClick={() => setIsSubmitted(false)}
+                  className="mt-4 px-6 py-2 glass-dark text-slate-300 hover:text-white text-xs rounded border border-white/10"
                 >
-                  Send Another Inquiry
+                  Send Another Dispatch
                 </button>
               </div>
             ) : (
@@ -87,7 +84,7 @@ export const ContactPage: React.FC = () => {
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Julian Vance"
+                      placeholder="e.g. Lady Katherine Vance"
                       className="w-full px-3.5 py-2.5 bg-black/40 border border-white/10 rounded text-sm text-white focus:outline-none focus:border-[#d4af37]"
                     />
                   </div>
@@ -99,7 +96,7 @@ export const ContactPage: React.FC = () => {
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="e.g. julian@estate.com"
+                      placeholder="katherine@domain.com"
                       className="w-full px-3.5 py-2.5 bg-black/40 border border-white/10 rounded text-sm text-white focus:outline-none focus:border-[#d4af37]"
                     />
                   </div>
@@ -107,12 +104,12 @@ export const ContactPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs text-slate-400 block mb-1">Telephone</label>
+                    <label className="text-xs text-slate-400 block mb-1">Phone Number</label>
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+1 (415) 890-3420"
+                      placeholder="+1 (415) 000-0000"
                       className="w-full px-3.5 py-2.5 bg-black/40 border border-white/10 rounded text-sm text-white focus:outline-none focus:border-[#d4af37]"
                     />
                   </div>
@@ -152,17 +149,30 @@ export const ContactPage: React.FC = () => {
             )}
           </div>
 
-          {/* Right Column: Physical Details & 3D Location Scene */}
+          {/* Right Column: Physical Details & Location Card */}
           <div className="lg:col-span-5 space-y-6">
-            {/* 3D Architectural Pavilion */}
-            <div className="glass-card p-4 rounded-2xl border border-gold-subtle overflow-hidden">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-[#d4af37] px-2 block mb-2 font-semibold">
-                3D Embarcadero Pavilion Beacon
-              </span>
-              <div className="h-60 rounded-xl overflow-hidden glass-dark border border-white/5 relative">
-                <Location3DScene />
+            {/* Restaurant Exterior/Interior Architecture Card */}
+            <FoodTilt maxRotateX={3} maxRotateY={3} glare={true}>
+              <div className="glass-card p-3 rounded-2xl border border-gold-subtle overflow-hidden">
+                <div className="h-60 rounded-xl overflow-hidden relative group">
+                  <img
+                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80"
+                    alt="The Ember Table Embarcadero Pavilion"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                  <div className="absolute bottom-3 left-4 right-4">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#d4af37] font-semibold block">
+                      Historic Embarcadero Waterfront
+                    </span>
+                    <h4 className="font-serif text-base text-white font-medium">
+                      The Ember Table Sanctuary
+                    </h4>
+                  </div>
+                </div>
               </div>
-            </div>
+            </FoodTilt>
 
             <div className="glass-card p-6 sm:p-8 rounded-2xl border border-gold-subtle space-y-6">
               <h3 className="font-serif text-xl text-white font-medium">Hearth Location</h3>
@@ -211,20 +221,20 @@ export const ContactPage: React.FC = () => {
                   href={`https://wa.me/${siteSettings.whatsappNumber.replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-3 bg-[#25D366]/20 border border-[#25D366]/40 hover:bg-[#25D366]/30 text-[#25D366] text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  className="w-full py-3 bg-[#25D366]/20 border border-[#25D366]/40 hover:bg-[#25D366]/30 text-[#25D366] text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors font-mono"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Direct Concierge on WhatsApp</span>
                 </a>
               </div>
 
-              {/* Google Maps Embed / Link */}
+              {/* Google Maps Link */}
               <div className="pt-2">
                 <a
                   href={siteSettings.googleMapsUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="block text-center py-2.5 glass-dark text-slate-300 hover:text-white text-xs font-semibold rounded border border-white/10"
+                  className="block text-center py-2.5 glass-dark text-slate-300 hover:text-white text-xs font-semibold rounded border border-white/10 font-mono uppercase tracking-wider"
                 >
                   Open in Google Maps ↗
                 </a>
